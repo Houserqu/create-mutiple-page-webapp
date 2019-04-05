@@ -1,0 +1,25 @@
+{
+  "name": "gulp-mutiple-page",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "gulp"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "browserify": "^16.2.3",
+    "del": "^4.0.0",
+    "gulp": "^4.0.0",
+    "gulp-cssmin": "^0.2.0",
+    "gulp-ejs": "^3.3.0",
+    "gulp-less": "^4.0.1",
+    "gulp-sequence": "^1.0.0",
+    "gulp-typescript": "^5.0.1",
+    "tsify": "^4.0.1",
+    "typescript": "^3.4.1",
+    "vinyl-source-stream": "^2.0.0"
+  }
+}
