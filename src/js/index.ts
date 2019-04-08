@@ -1,5 +1,5 @@
 import { add } from "./utils"
 
-add().then(v => {
+add("index88").then(v => {
   console.log(v)
 })
