@@ -12,10 +12,9 @@ var browserSync = require("browser-sync")
 var rev = require("gulp-rev-append")
 var rename = require("gulp-rename")
 var es = require("event-stream")
-var tap = require("gulp-tap")
-var buffer = require("gulp-buffer")
 var glob = require("glob")
 
+// 路径定义
 var path = {
   tsEntries: ["src/js/index.ts", "src/js/detail.ts"]
 }
@@ -123,27 +122,39 @@ gulp.task("rev", function() {
     .pipe(gulp.dest("./dist"))
 })
 
-// watchify ts，加快 ts 编译速度
-var watchedBrowserify = watchify(
-  browserify({
-    basedir: ".",
-    debug: true,
-    entries: path.tsEntries,
-    cache: {},
-    packageCache: {}
-  }).plugin(tsify)
-)
+// 监听 ts 文件，使用 watchify 进行更新
+gulp.task("watch:ts", function(done) {
+  glob("./src/js/*.ts", function(err, files) {
+    if (err) {
+      done(err)
+      return
+    }
 
-function bundle() {
-  return watchedBrowserify
-    .bundle()
-    .pipe(source("bundle.js"))
-    .pipe(gulp.dest("dist/js"))
-    .pipe(server.reload({ stream: true }))
-}
+    files.forEach(file => {
+      // console.log(file)
+      var bundler = watchify(browserify({ entries: file }).plugin(tsify))
+      // console.log(bundler)
+      bundlerFn = function() {
+        return bundler
+          .bundle()
+          .pipe(source(file))
+          .pipe(
+            rename({
+              dirname: "",
+              extname: ".bundle.js"
+            })
+          )
+          .pipe(gulp.dest("dist/js"))
+          .pipe(server.reload({ stream: true }))
+      }
 
-watchedBrowserify.on("update", bundle)
-watchedBrowserify.on("log", gutil.log)
+      bundler.on("update", bundlerFn)
+      bundler.on("log", gutil.log)
+
+      return bundlerFn()
+    })
+  })
+})
 
 // 监听文件变动自动构建
 gulp.task("watch", function() {
@@ -160,9 +171,6 @@ gulp.task("watch", function() {
     gulp.series("copy-public")
   )
   gulp.watch(["./src/js/vendor/**/*"], gulp.series("copy-js-vendor"))
-
-  // 处理 ts 编译工作
-  return bundle()
 })
 
 // build 主任务
@@ -180,4 +188,4 @@ gulp.task(
 )
 
 // dev 主任务
-gulp.task("dev", gulp.series("serve", "watch"))
+gulp.task("dev", gulp.series("serve", "watch:ts", "watch"))

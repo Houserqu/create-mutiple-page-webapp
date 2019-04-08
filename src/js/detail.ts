@@ -1,5 +1,5 @@
 import { add } from "./utils"
 
-add().then(v => {
+add("detail").then(v => {
   console.log(v)
 })

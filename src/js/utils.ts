@@ -1,7 +1,7 @@
-export function add() {
+export function add(text: string) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      resolve("finished  8889999")
+      resolve(text)
     }, 1000)
   })
 }
