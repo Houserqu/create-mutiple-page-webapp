@@ -14,11 +14,6 @@ var rename = require("gulp-rename")
 var es = require("event-stream")
 var glob = require("glob")
 
-// 路径定义
-var path = {
-  tsEntries: ["src/js/index.ts", "src/js/detail.ts"]
-}
-
 // 创建静态服务器
 var server = browserSync.create()
 gulp.task("serve", function(done) {
@@ -95,7 +90,7 @@ gulp.task("ts", function(done) {
         .pipe(
           rename({
             dirname: "",
-            extname: ".bundle.js"
+            extname: ".js"
           })
         )
         .pipe(gulp.dest("./dist/js"))
@@ -141,7 +136,7 @@ gulp.task("watch:ts", function(done) {
           .pipe(
             rename({
               dirname: "",
-              extname: ".bundle.js"
+              extname: ".js"
             })
           )
           .pipe(gulp.dest("dist/js"))
