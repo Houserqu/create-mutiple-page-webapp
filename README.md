@@ -24,7 +24,7 @@ git clone --depth 1 https://github.com/Houserqu/create-mutiple-page-webapp
 
 ### 开发模式
 
-使用 `npm start` 命令会在本地启动开发服务器，当代码文件变动时会自动更新。
+使用 `npm run dev` 命令会在本地启动开发服务器，当代码文件变动时会自动更新。
 
 ### 构建
 

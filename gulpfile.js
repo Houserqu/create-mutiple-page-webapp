@@ -13,11 +13,7 @@ var rev = require("gulp-rev-append")
 var rename = require("gulp-rename")
 var es = require("event-stream")
 var glob = require("glob")
-
-// 路径定义
-var path = {
-  tsEntries: ["src/js/index.ts", "src/js/detail.ts"]
-}
+var watch = require("gulp-watch")
 
 // 创建静态服务器
 var server = browserSync.create()
@@ -95,7 +91,7 @@ gulp.task("ts", function(done) {
         .pipe(
           rename({
             dirname: "",
-            extname: ".bundle.js"
+            extname: ".js"
           })
         )
         .pipe(gulp.dest("./dist/js"))
@@ -141,7 +137,7 @@ gulp.task("watch:ts", function(done) {
           .pipe(
             rename({
               dirname: "",
-              extname: ".bundle.js"
+              extname: ".js"
             })
           )
           .pipe(gulp.dest("dist/js"))
@@ -158,19 +154,38 @@ gulp.task("watch:ts", function(done) {
 
 // 监听文件变动自动构建
 gulp.task("watch", function() {
-  gulp.watch(["./src/**/*.ejs"], gulp.series("ejs", "reload"))
-  gulp.watch(["./src/style/*.less"], gulp.series("less", "reload"))
-  gulp.watch(
-    [
-      "./src/**/*",
-      "!./src/*.ejs",
-      "!./src/style/**",
-      "!./src/template-public/**",
-      "!./src/js/**"
-    ],
-    gulp.series("copy-public")
-  )
-  gulp.watch(["./src/js/vendor/**/*"], gulp.series("copy-js-vendor"))
+  // 监听 ejs 文件
+  watch(["./src/**/*.ejs"])
+    .pipe(
+      ejs(
+        {
+          msg: "Hello Gulp!"
+        },
+        {},
+        { ext: ".html" }
+      )
+    )
+    .pipe(gulp.dest("./dist"))
+    .pipe(server.reload({ stream: true }))
+
+  // 监听 less
+  watch(["./src/style/*.less"])
+    .pipe(less())
+    .pipe(cssmin())
+    .pipe(gulp.dest("./dist/style"))
+    .pipe(server.reload({ stream: true }))
+
+  // 监听无需编译的文件
+  watch([
+    "./src/**/*",
+    "!./src/*.ejs",
+    "!./src/style/**",
+    "!./src/template-public/**",
+    "!./src/js/**"
+  ]).pipe(gulp.dest("./dist"))
+
+  // 监听 js vendor 目录
+  watch(["./src/js/vendor/**/*"]).pipe(gulp.dest("./dist/js/vendor"))
 })
 
 // build 主任务
@@ -188,4 +203,4 @@ gulp.task(
 )
 
 // dev 主任务
-gulp.task("dev", gulp.series("serve", "watch:ts", "watch"))
+gulp.task("dev", gulp.series("serve", "watch", "watch:ts"))
